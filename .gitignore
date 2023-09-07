@@ -1,3 +1,4 @@
 ../main.moon
 ../main.lua
 ../run
+assets/*

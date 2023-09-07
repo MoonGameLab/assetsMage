@@ -3,6 +3,7 @@ path = ...
 love = love
 filesystem = love.filesystem
 ext = assert require path .. ".ext"
+tools = assert require path .. ".tools"
 
 -- config
 conf = {
@@ -10,29 +11,35 @@ conf = {
   delim: '/' or package.config\sub 1,1
 }
 
--- returns true if file.
-isFile = (path) ->
-  pathInfo = filesystem.getInfo(path)
-  pathInfo and pathInfo.type == "file"
+Mage = {}
 
-lastIndexOf = (str, char) ->
-  for i = str\len!, 1, -1
-    if str\sub(i, i) == char then return i
+with Mage
+  .loadAsset = (path, ...) ->
+    assert path, "Path should not be nil."
+    fileType = tools.getExtension path
 
-removeExt = (fileName) ->
-  fileName\sub 1, lastIndexOf(fileName, '.') - 1
+    if tools.exists ext.image, fileType
+      return love.graphics.newImage path, ...
+    elseif tools.exists ext.audio, fileType
+      return love.audio.newSource path, ... or 'static'
+    elseif tools.exists ext.font, fileType
+      return love.graphics.newFont path, ...
+    elseif tools.exists ext.video, fileType
+      return love.graphics.newVideo path, ...
+    else
 
-getExtension = (fileName) ->
-  fileName\sub (lastIndexOf(fileName, '.') or #fileName) + 1
+      for k, v in pairs ext
+        for i = 1, #ext[k]
+          p = path .. '.' .. ext[k][i]
+          info = love.filesystem.getInfo p
+          if info
+            if info.type == "file"
+              return Mage.loadAsset p, ...
 
--- NOTE: Will overide the val of keys that exists in multiple tabs.
-mergeTabs = (tab, ...) ->
-  for _, i in ipairs {...}
-    for k, j in pairs(i)
-      tab[k] = j
+  
 
-exists = (tab, elem) ->
-  for i, el in ipairs tab
-    if el == elem
-      return true
-  false
+
+
+
+
+Mage
