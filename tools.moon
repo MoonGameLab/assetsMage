@@ -1,3 +1,6 @@
+love = love
+filesystem = love.filesystem
+
 -- returns true if file.
 isFile = (path) ->
   pathInfo = filesystem.getInfo(path)
@@ -6,6 +9,7 @@ isFile = (path) ->
 lastIndexOf = (str, char) ->
   for i = str\len!, 1, -1
     if str\sub(i, i) == char then return i
+  return str\len! + 1
 
 removeExt = (fileName) ->
   fileName\sub 1, lastIndexOf(fileName, '.') - 1
@@ -25,12 +29,16 @@ exists = (tab, elem) ->
       return true
   false
 
+getWord = (fileName) ->
+  return string.match fileName\gsub ' ', '_', "[_%w]+"
+
 
 {
   isFile: isFile
   lastIndexOf: lastIndexOf
   removeExt: removeExt
-  getExtension: getExtension
+  getExt: getExtension
   mergeTabs: mergeTabs
   exists: exists
+  getWord: getWord
 }
