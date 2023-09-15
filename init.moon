@@ -88,4 +88,31 @@ with Mage
               tools.mergeTabs libTab, Mage.requireLib path..delim..file,recurse,tbl,rename,except,isPackage,debugTab..'\t'
     return libTab
 
+  .load = (assetType,path,recurse,tbl,rename,except,param) =>
+    assert filesystem.getInfo(path), "Path does not exist : "..path
+
+    tbl = tbl
+    recurse = recurse or false
+    rename = rename or (tbl and tools.getWord or tools.removeExt)
+    except = except or -> return false
+    param  = param or ->
+    local libName
+
+    dir, assetTab = filesystem.getDirectoryItems(path), tbl or {}
+
+    for i = 1, #dir
+      if isFile path..conf.delim..dir[i]
+        libName = rename dir[i]
+        if except(dir[i]) == false and tools.exists(assetType, getExtension(dir[i]))
+          if libName and assetTab[libName] == false
+            assetTab[libName] = Mage.loadAsset path..conf.delim..dir[i], param(dir[i])
+          else
+            if conf.debug
+              print "Asset "..libName.." already loaded."
+      else
+        if recurse
+          tools.mergeTabs assetTab, Mage.load assetType, path..conf.delim..dir[i], recurse, tbl, rename, except, param
+
+    return assetTab
+    
 Mage
